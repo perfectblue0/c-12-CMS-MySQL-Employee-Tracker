@@ -16,6 +16,7 @@ CREATE TABLE role(
     FOREIGN KEY (department_id)
     REFERENCES department(id)
     ON DELETE CASCADE
+    /* or should set null? */
 );
 
 CREATE TABLE employee(
@@ -23,7 +24,7 @@ CREATE TABLE employee(
     first_name VARCHAR(30) NOT NULL,
     last_name VARCHAR(30) NOT NULL,
     role_id INT,
-     manager_id INT NULL,
+    manager_id INT NULL,
     FOREIGN KEY (role_id)
     REFERENCES role(id)
     ON DELETE CASCADE,
@@ -31,3 +32,5 @@ CREATE TABLE employee(
     REFERENCES employee(id)
     ON DELETE CASCADE
 );
+
+/* why is role (29) in orange? */
