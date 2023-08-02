@@ -1,17 +1,12 @@
-/* (copied and pasted miniproject)
-- should i put the connecting part of my code in a config file? 
-- should i add a .env file to conceal my mysql password? */
-
-
 // Import and require mysql2
 const mysql = require('mysql2');
-const inquirer = require("inquirer");
+const inquirer = require('inquirer');
 
 // Connect to database
 const db = mysql.createConnection(
   {
-    host: 'localhost',
-    // MySQL username,
+    host: '127.0.0.1',
+    // MySQL username
     user: 'root',
     // Add your MySQL password here
     password: 'limon',
@@ -55,22 +50,22 @@ function menu() {
 menu();
 
 function viewAllDepartments() {
-    db.query("SELECT * FROM department", (err, res)=> {
-        console.table(res);
+    db.query("SELECT * FROM department", (err, results)=> {
+        console.table(results);
         menu();
     })
 }
 
 function viewAllRoles() {
-    db.query("SELECT * FROM role", (err, res)=> {
-        console.table(res);
+    db.query("SELECT * FROM role", (err, results)=> {
+        console.table(results);
         menu();
     })
 }
 
 function viewAllEmployees() {
-    db.query("SELECT * FROM employee", (err, res)=> {
-        console.table(res);
+    db.query("SELECT * FROM employee", (err, results)=> {
+        console.table(results);
         menu();
     })
 }
@@ -82,8 +77,8 @@ function addDepartments() {
         message: "What is the new department name?"
     }).then(
         function(data) {
-            db.query("INSERT INTO department(name_department) VALUES(?)", data.name_department,(err, res)=> {
-                console.table(res);
+            db.query("INSERT INTO department(name_department) VALUES(?)", data.name_department,(err, results)=> {
+                console.table(results);
                 menu();
             })
         }
@@ -148,7 +143,7 @@ function addEmployee() {
     ]).then(
         function(data) {
             db.query(
-                "INSERT INTO employee(first_name, last_name, role_id, manger_id) VALUES(?,?,?,?)", 
+                "INSERT INTO employee(first_name, last_name, role_id, manager_id) VALUES(?,?,?,?)", 
                 [data.first_name, data.last_name, data.role_id, data.manager_id],
                 (err, results) => {
                     console.log("A new employee has been added");
@@ -158,110 +153,3 @@ function addEmployee() {
         } 
     )
 }
-/*
-// Create a movie
-app.post('/api/new-movie', ({ body }, res) => {
-  const sql = `INSERT INTO movies (movie_name)
-    VALUES (?)`;
-  const params = [body.movie_name];
-  
-  db.query(sql, params, (err, result) => {
-    if (err) {
-      res.status(400).json({ error: err.message });
-      return;
-    }
-    res.json({
-      message: 'success',
-      data: body
-    });
-  });
-});
-
-// Read all movies
-app.get('/api/movies', (req, res) => {
-  const sql = `SELECT fid, movie_name AS title FROM movies`;
-
-  console.log(sql);
-  
-  db.query(sql, (err, rows) => {
-    if (err) {
-      res.status(500).json({ error: err.message });
-       return;
-    }
-    console.log(rows);
-    res.json({
-      message: 'success',
-      data: rows
-    });
-  });
-});
-
-// Delete a movie
-app.delete('/api/movie/:id', (req, res) => {
-  const sql = `DELETE FROM movies WHERE id = ?`;
-  const params = [req.params.id];
-  
-  db.query(sql, params, (err, result) => {
-    if (err) {
-      res.statusMessage(400).json({ error: res.message });
-    } else if (!result.affectedRows) {
-      res.json({
-      message: 'Movie not found'
-      });
-    } else {
-      res.json({
-        message: 'deleted',
-        changes: result.affectedRows,
-        id: req.params.id
-      });
-    }
-  });
-});
-
-// Read list of all reviews and associated movie name using LEFT JOIN
-app.get('/api/movie-reviews', (req, res) => {
-  const sql = `SELECT movies.movie_name AS movie, reviews.review FROM reviews LEFT JOIN movies ON reviews.movie_id = movies.id ORDER BY movies.movie_name;`;
-  db.query(sql, (err, rows) => {
-    if (err) {
-      res.status(500).json({ error: err.message });
-      return;
-    }
-    res.json({
-      message: 'success',
-      data: rows
-    });
-  });
-});
-
-// BONUS: Update review name
-app.put('/api/review/:id', (req, res) => {
-  const sql = `UPDATE reviews SET review = ? WHERE id = ?`;
-  const params = [req.body.review, req.params.id];
-
-  db.query(sql, params, (err, result) => {
-    if (err) {
-      res.status(400).json({ error: err.message });
-    } else if (!result.affectedRows) {
-      res.json({
-        message: 'Movie not found'
-      });
-    } else {
-      res.json({
-        message: 'success',
-        data: req.body,
-        changes: result.affectedRows
-      });
-    }
-  });
-});
-
-// Default response for any other request (Not Found)
-app.use((req, res) => {
-  res.status(404).end();
-});
-
-app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
-});
-
-*/
