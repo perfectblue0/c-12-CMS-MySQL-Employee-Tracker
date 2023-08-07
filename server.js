@@ -15,8 +15,33 @@ const db = mysql.createConnection(
   console.log(`Connected to the company_db database.`)
 );
 
-// todo: write out function
-function queryTitles();
+async function queryTitles() {
+    return new Promise((resolve, reject) => {
+        db.query("SELECT * FROM role", (err, results) => {
+            if (err) return reject(err);
+            resolve(results);
+        });
+    });
+}
+
+async function queryAllEmployees() {
+    return new Promise((resolve, reject) => {
+        db.query("SELECT * FROM employee", (err, results) => {
+            if (err) return reject(err);
+            resolve(results);
+        });
+    });
+}
+
+async function queryDepartments() {
+    return new Promise((resolve, reject) => {
+        db.query("SELECT * FROM department", (err, results) => {
+            if (err) return reject(err);
+            resolve(results);
+        });
+    });
+}
+
 
 function menu() {
     inquirer.prompt (
@@ -42,7 +67,7 @@ function menu() {
             } else if (data.menu === "Add an Employee") {
                 addEmployee();
             } else if (data.menu === "Update an Employee Role") {
-                updateEmployeeRole();
+                newUpdateEmployee();
             } else {
                 db.end();
             }
@@ -75,6 +100,7 @@ function viewAllEmployees() {
                employee.last_name AS 'Last Name',
                role.title AS 'Job Title',
                department.name_department AS 'Department Name',
+               role.salary AS 'Salary',
                CONCAT(m.first_name, ' ', m.last_name) AS 'Manager Name'
         FROM employee
         INNER JOIN role ON employee.role_id = role.id
@@ -103,11 +129,10 @@ function addDepartments() {
             });
         }
     );
-    
 }
 
-// todo: refactor so there are choices with a list of deparments
-function addRole() {
+async function addRole() {
+    const deptList = await queryDepartments();
     inquirer.prompt([
         {
         type: "input",
@@ -120,11 +145,11 @@ function addRole() {
         message: "What is the new salary?"
         },
         {
-        type: "input",
+        type: "list",
         name: "department_id",
-        message: "What is the new department id?"
+        message: "What is the new department id?",
+        choices: deptList.map((dep) => ({ name: dep.name_department, value: dep.id})),
         }
-        
     ]).then(
         function(data) {
             db.query(
@@ -134,15 +159,15 @@ function addRole() {
                     if (err) throw err;
                     console.log("A new role has been added");
                     menu();
-                } 
-            )
-        } 
-    )
+                }
+            );
+        }
+    );
 }
 
-// todo: continue working on this function for better UI
 async function addEmployee() {
     const jobTitles = await queryTitles();
+
     inquirer.prompt([
         {
         type: "input",
@@ -180,53 +205,40 @@ async function addEmployee() {
     )
 }
 
+async function newUpdateEmployee() {
 
-// function updateEmployeeRole() {
-//     const employeePromise = db.promise().query("SELECT * FROM employee");
-//     const rolesPromise = db.promise().query("SELECT * FROM role");
-//     Promise.all([employeePromise, rolesPromise])
-//       .then(([allEmployees, allRoles]) => {
-//         let employeeChoices = allEmployees[0].map(({ id, first_name, last_name }) =>
-//           ({
-//             name: first_name + " " + last_name,
-//             value: id,
-//           })
-//         );
-//         let roleChoices = allRoles[0].map(({ id, title }) =>
-//           ({
-//             name: title,
-//             value: id,
-//           })
-//         );
-//         return inquirer.prompt([
-//           {
-//             type: "list",
-//             name: "id",
-//             message: "Select which employee is being updated",
-//             choices: employeeChoices
-//           },
-//           {
-//             type: "list",
-//             name: "role_id",
-//             message: "Select the employee's new role",
-//             choices: roleChoices
-//           }
-//         ]);
-//       })
-//       .then(updateAnswers => {
-//         const sql = "UPDATE employee SET role_id = ? WHERE id = ?";
-//         const params = [updateAnswers.role_id, updateAnswers.id];
-//         db.query(sql, params, (err, results) => {
-//           if (err) {
-//             console.log(err);
-//           }
-//           console.log(`Employee role has been updated`);
-//           menu();
-//         });
-//       })
-//       .catch(err => {
-//         console.log(err);
-//       });
-      
-//   }
-  
+    const allEmployees = await queryAllEmployees();
+    const jobTitles = await queryTitles();
+
+    inquirer.prompt([
+        {
+            name: "employeeSelection",
+            message: "Which employee would you like to update?",
+            type: "list",
+            choices: allEmployees.map((employee) => ({name: employee.first_name + " " + employee.last_name, value: employee.id}))
+        },
+        {
+            name: "roleId",
+            type: "list",
+            message: "Select the new role",
+            choices: jobTitles.map((job) => ({ name: job.title, value: job.id})), 
+        }
+    ]).then(function (data) {
+        db.query(
+            "UPDATE employee SET ? WHERE ?",
+            [
+                {
+                    role_id: data.roleId
+                },
+                {
+                    id: data.employeeSelection
+                }
+            ],
+            (err, results) => {
+                if (err) throw err;
+                console.log("Employee's role has been updated");
+                menu();
+            }
+        );
+    });
+}
