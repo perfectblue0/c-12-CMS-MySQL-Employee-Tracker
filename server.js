@@ -147,7 +147,7 @@ async function addRole() {
         {
         type: "list",
         name: "department_id",
-        message: "What is the new department id?",
+        message: "What department does this new role belong to?",
         choices: deptList.map((dep) => ({ name: dep.name_department, value: dep.id})),
         }
     ]).then(
@@ -182,7 +182,7 @@ async function addEmployee() {
         {
         type: "list",
         name: "role_id",
-        message: "What is the role id of the new employee?",
+        message: "What is the job title of the new employee?",
         choices: jobTitles.map((job) => ({ name: job.title, value: job.id})),
         },
         {
