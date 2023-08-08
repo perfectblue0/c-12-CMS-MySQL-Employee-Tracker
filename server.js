@@ -167,6 +167,7 @@ async function addRole() {
 
 async function addEmployee() {
     const jobTitles = await queryTitles();
+    const allEmployees = await queryAllEmployees();
 
     inquirer.prompt([
         {
@@ -186,9 +187,13 @@ async function addEmployee() {
         choices: jobTitles.map((job) => ({ name: job.title, value: job.id})),
         },
         {
-        type: "input",
+        type: "list",
         name: "manager_id",
-        message: "What is the manager id of the new employee?"
+        message: "Select the manager of the new employee:",
+        choices: allEmployees.map((employee) => ({
+            name: employee.first_name + " " + employee.last_name,
+            value: employee.id
+            })),
         } 
     ]).then(
         function(data) {
