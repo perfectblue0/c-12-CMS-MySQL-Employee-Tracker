@@ -1,8 +1,8 @@
-// Import and require mysql2
+// Imports and requires mysql2 and inquirer
 const mysql = require('mysql2');
 const inquirer = require('inquirer');
 
-// Connect to database
+// Connects to database
 const db = mysql.createConnection(
   {
     host: '127.0.0.1',
@@ -15,6 +15,7 @@ const db = mysql.createConnection(
   console.log(`Connected to the company_db database.`)
 );
 
+// function to query job titles(roles)
 async function queryTitles() {
     return new Promise((resolve, reject) => {
         db.query("SELECT * FROM role", (err, results) => {
@@ -24,6 +25,7 @@ async function queryTitles() {
     });
 }
 
+// function to query employees
 async function queryAllEmployees() {
     return new Promise((resolve, reject) => {
         db.query("SELECT * FROM employee", (err, results) => {
@@ -33,6 +35,7 @@ async function queryAllEmployees() {
     });
 }
 
+// function to query departments
 async function queryDepartments() {
     return new Promise((resolve, reject) => {
         db.query("SELECT * FROM department", (err, results) => {
@@ -42,7 +45,7 @@ async function queryDepartments() {
     });
 }
 
-
+// displays main menu that will list options for user and based on their choices will call functions(all functions call menu() after displaying, adding, and updating - will not be called if user chooses 'Exit' option)
 function menu() {
     inquirer.prompt (
         {
@@ -75,9 +78,12 @@ function menu() {
     )
 }
 
+// starts the program
 menu();
 
+// views all departments 
 function viewAllDepartments() {
+    // queries and shows a table of all departments
     db.query("SELECT department.id AS `Department id`, name_department AS `Department Name` FROM department", (err, results) => {
         if (err) throw err;
         console.table(results);
@@ -85,7 +91,9 @@ function viewAllDepartments() {
     });
 }
 
+// views all job titles (roles)
 function viewAllRoles() {
+    // queries and shows a table of all job titles and department names they belong to
     db.query("SELECT role.id AS `Role id`, role.title AS `Job Title`, role.salary AS `Salary`, department.name_department AS `Department Name` FROM role INNER JOIN department ON role.department_id = department.id", (err, results) => {
         if (err) throw err;
         console.table(results);
@@ -93,7 +101,10 @@ function viewAllRoles() {
     });
 }
 
+// view all employees
 function viewAllEmployees() {
+    // query that gets data about employees, their job titles(roles), departments, and managers from database.
+    // uses self-join to associate each employee with their manager (includes manager first and last name)
     const query = `
         SELECT employee.id AS 'Employee ID',
                employee.first_name AS 'First Name',
@@ -106,7 +117,6 @@ function viewAllEmployees() {
         INNER JOIN role ON employee.role_id = role.id
         INNER JOIN department ON role.department_id = department.id
         LEFT JOIN employee m ON employee.manager_id = m.id`;
-
     db.query(query, (err, results) => {
         if (err) throw err;
         console.table(results);
@@ -114,13 +124,15 @@ function viewAllEmployees() {
     });
 }
 
-
+// adds a new department
 function addDepartments() {
+    // asks user for new department name
     inquirer.prompt({
         type: "input",
         name: "name_department",
         message: "What is the new department name?"
     }).then(
+        // inserts new department name into 'department' table
         function(data) {
             db.query("INSERT INTO department(name_department) VALUES(?)", data.name_department,(err, results)=> {
                 if (err) throw err;
@@ -131,8 +143,11 @@ function addDepartments() {
     );
 }
 
+// adds a new role
 async function addRole() {
+    // function that queries department (is used to )
     const deptList = await queryDepartments();
+    // asks user for new job title (role), salary, and department
     inquirer.prompt([
         {
         type: "input",
@@ -151,6 +166,7 @@ async function addRole() {
         choices: deptList.map((dep) => ({ name: dep.name_department, value: dep.id})),
         }
     ]).then(
+        // inserts the new role data into 'role' table
         function(data) {
             db.query(
                 "INSERT INTO role(title, salary, department_id) VALUES(?,?,?)", 
@@ -165,10 +181,13 @@ async function addRole() {
     );
 }
 
+// adds a new employee
 async function addEmployee() {
+    // queries job titles(roles)
     const jobTitles = await queryTitles();
+    // queries employees
     const allEmployees = await queryAllEmployees();
-
+    // asks user for new employee's first name, last name, job title(role), and manager
     inquirer.prompt([
         {
         type: "input",
@@ -196,6 +215,7 @@ async function addEmployee() {
             })),
         } 
     ]).then(
+        // inserts new employee into 'employee' table
         function(data) {
             db.query(
                 "INSERT INTO employee(first_name, last_name, role_id, manager_id) VALUES(?,?,?,?)", 
@@ -210,11 +230,13 @@ async function addEmployee() {
     )
 }
 
+// updates an employee's job title(role)
 async function newUpdateEmployee() {
-
+    // queries all employees
     const allEmployees = await queryAllEmployees();
+    // queries job titles(roles)
     const jobTitles = await queryTitles();
-
+    // asks user to select which employee to update and what their new role is going to be
     inquirer.prompt([
         {
             name: "employeeSelection",
@@ -228,7 +250,9 @@ async function newUpdateEmployee() {
             message: "Select the new role",
             choices: jobTitles.map((job) => ({ name: job.title, value: job.id})), 
         }
-    ]).then(function (data) {
+    ]).then(
+        // updates the selected employee's job title(role) in the 'employee' table
+        function (data) {
         db.query(
             "UPDATE employee SET ? WHERE ?",
             [
