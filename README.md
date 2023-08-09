@@ -14,12 +14,13 @@ I created this application so non-developers could view and interact with data s
 
 ## Installation
 
-To use this application clone the repo and using your terminal, type in ‘npm install’. Once you have installed the dependencies, change the password located in the server.js file to your MySQL password and save the file. Then sign into MySQL and source the schema.sql file and the seeds.sql file as well. Next, exit MySQL and type in ‘npm start’.
+To use this application clone the repo and using your terminal, type in 'npm i' or ‘npm install’. Once you have installed the dependencies, change the password located in the server.js file to your MySQL password and save the file. Then sign into MySQL and source the schema.sql file and the seeds.sql file as well. Next, exit MySQL and type in ‘npm start’.
 
 ### GitHub Repo:
 https://github.com/perfectblue0/c-12-CMS-MySQL-Employee-Tracker
 
 ### For a video preview of the basic functionality of this application, visit this link:
+https://drive.google.com/file/d/1c2YLm7K4FrM-jIGpjMhKdGMBFWLhT-F_/view
 
 ## Usage
 
