@@ -5,7 +5,7 @@
 
 I created this application so non-developers could view and interact with data stored in a database using an interface called content management systems (CMS). Through the command line, users can manage a company’s employee database. This application uses Node.js, Inquirer, and MySQL.
 
-## Table of Contents (Optional)
+## Table of Contents
 
 - [Installation](#installation)
 - [Usage](#usage)
