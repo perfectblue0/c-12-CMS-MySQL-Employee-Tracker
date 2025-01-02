@@ -43,7 +43,7 @@ To exit the application you can select the ‘Exit’ option on the main menu.
 
 ## Credits
 
-I made this project with help from Zoom class recordings where Samantha Randolph, my instructor, demonstrated how to begin the project. I also received help from one-on-one tutoring with Abdullah Al Hilfi. In addition to their support, I used the Zoom recording of the challenge review sessions where Kayvan Kazemini demonstrated how to complete this project.
+I made this project with help from Zoom class recordings where Samantha Randolph, my instructor, demonstrated how to begin the project. I also received help from one-on-one tutoring with Abdullah Al Hilfi. In addition to their support, I used the Zoom recording of the challenge review sessions where Kayvan Kazemini provided additional support for this project.
 ## License
 
 Please refer to the repo
